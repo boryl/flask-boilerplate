@@ -1,18 +1,8 @@
-"""
-from . import db
+from app import db
 
-class Author(db.Document):
-    name = db.StringField()
-
-
-class Book(db.Document):
-    title = db.StringField()
-    author = db.DocumentField(Author)
-    year = db.IntField();
-"""
-class Author():
-    name = ""
-
-
-class Book():
-    title = ""
+class Author(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(64))
+	
+	def __repr__(self):
+		return '<Author {}>'.format(self.name)
