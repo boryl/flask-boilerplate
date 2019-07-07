@@ -1,4 +1,4 @@
-from app import db
+from app import db, ma
 
 class Author(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -6,3 +6,7 @@ class Author(db.Model):
 	
 	def __repr__(self):
 		return '<Author {}>'.format(self.name)
+		
+class AuthorSchema(ma.ModelSchema):
+	class Meta:
+		model = Author
