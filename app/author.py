@@ -1,9 +1,10 @@
 from flask import Blueprint, jsonify
+from flask import current_app as app
+from .models import db
 from .models import Author, AuthorSchema
-from app import db
 
 
-author_bp = Blueprint('author', __name__)
+author_bp = Blueprint('author_bp', __name__)
 
 author_schema = AuthorSchema()
 
@@ -28,8 +29,5 @@ def list_authors():
 		}
 		return jsonify(response), 404
 	result = author_schema.jsonify(author)
-	response= {
-		'data': result,
-		'status_code' : 202
-	}
-	return jsonify(response)
+	
+	return result
