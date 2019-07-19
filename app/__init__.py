@@ -4,12 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 
-
-
 db = SQLAlchemy()
 migrate = Migrate()
 ma = Marshmallow()
-#print(app.config['SECRET_KEY'])
+
 def create_app():
 	app = Flask(__name__)
 	app.config.from_object('config.DevConfig')
@@ -23,9 +21,10 @@ def create_app():
 		# Blueprints
 		from . import routes
 		from . import author
-		#app.register_blueprint(author_bp, url_prefix="/author")
+		
 		app.register_blueprint(routes.main_bp)
-		app.register_blueprint(author.author_bp)
+		app.register_blueprint(author.author_bp, url_prefix='/author')
+		
 		return app
 
 
