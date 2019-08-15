@@ -21,9 +21,11 @@ def create_app():
 		# Blueprints
 		from . import routes
 		from . import author
+		from . import book
 		
 		app.register_blueprint(routes.main_bp)
 		app.register_blueprint(author.author_bp, url_prefix='/author')
+		app.register_blueprint(book.book_bp, url_prefix='/book')
 		
 		return app
 

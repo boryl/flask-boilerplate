@@ -1,61 +1,64 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from flask import current_app as app
-from .models import db, Author, AuthorSchema
+from .models import db, Book, BookSchema, BookPostSchema
 from sqlalchemy.exc import IntegrityError
 
-author_bp = Blueprint('author_bp', __name__)
+book_bp = Blueprint('book_bp', __name__)
 
-author_schema = AuthorSchema()
-authors_schema = AuthorSchema(many=True)
+book_post_schema = BookPostSchema()
+book_schema = BookSchema()
+books_schema = BookSchema(many=True)
 
 
 ##CREATE
-@author_bp.route('/', methods=['POST'])
-def new_author():
+@book_bp.route('/', methods=['POST'])
+def new_book():
 	payload = request.json
 	
-	new_author, errors = author_schema.load(payload)
+	new_book, errors = book_post_schema.load(payload)
 	
 	# Validate payload
 	if(errors):
 		abort(make_response(jsonify(error='Can´t parse payload'), 400))
 	
-	try:
-		db.session.add(new_author)
-		db.session.commit()
-	except IntegrityError:
-		db.session.rollback()
-		abort(make_response(jsonify(error='Author {name} exists already'.format(name=payload['name'])), 409))
+	book_author = Author.query.get(payload['author_id'])
 	
-	return jsonify(author_schema.dump(new_author).data), 201
+	if book_author is None:
+		abort(make_response(jsonify(error='Author not found for id: {author_id}'.format(author_id=payload['author_id'])), 404))
+	
+	
+	db.session.add(new_book)
+	db.session.commit()
+	
+	return jsonify(book_schema.dump(new_book).data), 201
 
 
 
 # READ
-@author_bp.route('/<int:author_id>', methods=['GET'])
-def list_author(author_id):
-	author = Author.query.get(author_id)
+@book_bp.route('/<int:book_id>', methods=['GET'])
+def list_book(book_id):
+	book = Book.query.get(book_id)
 	
-	if author is None:
-		abort(make_response(jsonify(error='Author not found for id: {author_id}'.format(author_id=author_id)), 404))
+	if book is None:
+		abort(make_response(jsonify(error='Book not found for id: book_id'.format(book_id=book_id)), 404))
 		
 	else:
-		return jsonify(author_schema.dump(author).data), 200
+		return jsonify(book_schema.dump(book).data), 200
 
 
-@author_bp.route('/', methods=['GET'])	
-def list_authors():
-	authors = Author.query.order_by(Author.name).all()
-	if authors is None:
-		abort(make_response(jsonify(error='Authors not found'), 404))
+@book_bp.route('/', methods=['GET'])	
+def list_books():
+	books = Book.query.order_by(Book.title).all()
+	if books is None:
+		abort(make_response(jsonify(error='Books not found'), 404))
 		
 	else:
-		return jsonify(authors_schema.dump(authors).data), 200
+		return jsonify(books_schema.dump(books).data), 200
 	
 
-
+"""
 # UPDATE
-@author_bp.route('/<int:author_id>', methods=['PUT'])
+@book_bp.route('/<int:author_id>', methods=['PUT'])
 def update_author(author_id):
 	
 	payload = request.json
@@ -84,7 +87,7 @@ def update_author(author_id):
 		
 
 # DELETE
-@author_bp.route('/<int:author_id>', methods=['DELETE'])
+@book_bp.route('/<int:author_id>', methods=['DELETE'])
 def delete_author(author_id):
 	
 	# Get the person requested
@@ -97,3 +100,4 @@ def delete_author(author_id):
 		db.session.delete(author)
 		db.session.commit()
 		return make_response(jsonify(message='Author {id} deleted'.format(id=author_id)), 200)
+"""
