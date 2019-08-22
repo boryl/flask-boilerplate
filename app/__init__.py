@@ -3,10 +3,12 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
+from flasgger import Swagger
 
 db = SQLAlchemy()
 migrate = Migrate()
 ma = Marshmallow()
+swagger = Swagger()
 
 def create_app():
 	app = Flask(__name__)
@@ -21,15 +23,22 @@ def create_app():
 	migrate.init_app(app, db)
 	ma.init_app(app)
 	
+	swagger.init_app(app)
+	
 	with app.app_context():
-		# Blueprints
+		# Routes
 		from . import routes
 		from . import author
 		from . import book
 		
+		# Blueprints
 		app.register_blueprint(routes.main_bp)
-		app.register_blueprint(author.author_bp, url_prefix='/author')
-		app.register_blueprint(book.book_bp, url_prefix='/book')
+		app.register_blueprint(author.author_bp, url_prefix='/authors')
+		#app.register_blueprint(book.book_bp, url_prefix='/books')
+		
+		# API endpoints
+		app.add_url_rule("/books", view_func=book.Books.as_view("all_books_api"))
+		app.add_url_rule("/books/<entity>", view_func=book.Book.as_view("books_api"))
 		
 		return app
 

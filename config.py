@@ -10,6 +10,10 @@ class Config:
 	"""Base config vars."""
 	SECRET_KEY = os.getenv('SECRET_KEY')
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
+	OPENAPI_VERSION = '3.0.2'
+	OPENAPI_SWAGGER_UI_PATH = '/swagger'
+	OPENAPI_URL_PREFIX = '/spec'
+	OPENAPI_SWAGGER_UI_VERSION = '3.23.5'
 	
     
 class ProdConfig(Config):

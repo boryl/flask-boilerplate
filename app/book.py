@@ -1,15 +1,51 @@
-from flask import Blueprint, jsonify, abort, make_response, request
+from flask import jsonify, make_response, request,  Blueprint, abort
+from flask.views import MethodView
 from flask import current_app as app
 from .models import db, Book, BookSchema, BookPostSchema
 from sqlalchemy.exc import IntegrityError
+from flasgger import swag_from
 
-book_bp = Blueprint('book_bp', __name__)
+#book_bp = Blueprint('book_bp', __name__)
+#book_bp = Blueprint('books', 'books', url_prefix='/books', description='Operations on books')
 
 book_post_schema = BookPostSchema()
 book_schema = BookSchema()
 books_schema = BookSchema(many=True)
 
+class Books(MethodView):
+	
+	@swag_from('static/yml/books-get.yml')
+	def get(self):
+		return "return all books"
+	
+	def post(self):
+		""" Responds to POST requests """
+		return "Responding to a POST request"
 
+
+class Book(MethodView):
+	def get(self, entity):
+		""" Responds to GET requests """
+		payload = request.json
+		return jsonify(payload)
+
+	
+
+	def put(self, entity):
+		""" Responds to PUT requests """
+		return "Responding to a PUT request"
+
+	def patch(self, entity):
+		""" Responds to PATCH requests """
+		return "Responding to a PATCH request"
+
+	def delete(self, entity):
+		""" Responds to DELETE requests """
+		return "Responding to a DELETE request"
+
+
+
+"""
 ##CREATE
 @book_bp.route('/', methods=['POST'])
 def new_book():
@@ -55,7 +91,7 @@ def list_books():
 	else:
 		return jsonify(books_schema.dump(books).data), 200
 	
-
+"""
 """
 # UPDATE
 @book_bp.route('/<int:author_id>', methods=['PUT'])
