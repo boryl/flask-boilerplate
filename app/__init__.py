@@ -10,7 +10,11 @@ ma = Marshmallow()
 
 def create_app():
 	app = Flask(__name__)
-	app.config.from_object('config.DevConfig')
+	if(os.getenv('ENV') == 'PROD'):
+		config = 'ProdConfig'
+	else:
+		config = 'DevConfig'
+	app.config.from_object('config.' + config)
 	
 	# DB stuff
 	db.init_app(app)
