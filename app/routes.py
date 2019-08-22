@@ -5,7 +5,7 @@ main_bp = Blueprint('main_bp', __name__)
 
 @main_bp.route('/')
 def home():
-	return 'Homepage'
+	return app.config(SQLALCHEMY_DATABASE_URI)
 
 @app.errorhandler(404)
 def not_found(error):
