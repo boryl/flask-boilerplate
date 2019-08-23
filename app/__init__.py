@@ -26,7 +26,7 @@ def create_app():
 	
 	swagger.init_app(app)
 	
-	
+	app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.join(os.path.dirname(__file__), 'static'), prefix='static/')
 	
 	with app.app_context():
 		# Routes
@@ -43,7 +43,7 @@ def create_app():
 		app.add_url_rule("/books", view_func=book.Books.as_view("all_books_api"))
 		app.add_url_rule("/books/<entity>", view_func=book.Book.as_view("books_api"))
 		
-		app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.join(os.path.dirname(__file__), 'static'), prefix='static/')
+		
 		
 		return app
 
