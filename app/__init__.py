@@ -4,7 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flasgger import Swagger
-from whitenoise import WhiteNoise
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -27,7 +26,6 @@ def create_app():
 	swagger.init_app(app)
 	
 	
-	
 	with app.app_context():
 		# Routes
 		from . import routes
@@ -43,8 +41,7 @@ def create_app():
 		app.add_url_rule("/books", view_func=book.Books.as_view("all_books_api"))
 		app.add_url_rule("/books/<entity>", view_func=book.Book.as_view("books_api"))
 		
-		app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/')
-		
+		print(app.config)
 		return app
 
 

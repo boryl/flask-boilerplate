@@ -3,7 +3,6 @@ from flask.views import MethodView
 from flask import current_app as app
 from .models import db, Book, BookSchema, BookPostSchema
 from sqlalchemy.exc import IntegrityError
-from flasgger import swag_from
 
 #book_bp = Blueprint('book_bp', __name__)
 #book_bp = Blueprint('books', 'books', url_prefix='/books', description='Operations on books')
@@ -14,8 +13,10 @@ books_schema = BookSchema(many=True)
 
 class Books(MethodView):
 	
-	@swag_from('static/yml/books-get.yml')
 	def get(self):
+		"""
+		file: static/yml/books-get.yml
+		"""
 		return "return all books"
 	
 	def post(self):
