@@ -106,4 +106,4 @@ venv.bak/
 .DS_Store
 *.sqlite3
 resources/*
-!/**/.gitkeep
+!.gitkeep
