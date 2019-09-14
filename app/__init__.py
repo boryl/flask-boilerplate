@@ -29,7 +29,6 @@ def create_app():
 	swagger.init_app(app)
 	
 	if(app.config['ENV'] == 'DEV'):
-		
 		from . import cli
 		app.cli.add_command(cli.csvexport)
 		app.cli.add_command(cli.s3upload)
