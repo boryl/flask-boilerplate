@@ -1,16 +1,22 @@
-from flask import current_app as app
-from flask import Blueprint, make_response, jsonify
+from flask import Blueprint, request
+
 
 main_bp = Blueprint('main_bp', __name__)
 
+
+def num_to_excel_col(n):
+    if n < 1:
+        raise ValueError("Number must be positive")
+    result = ""
+    while True:
+        if n > 26:
+            n, r = divmod(n - 1, 26)
+            result = chr(r + ord('A')) + result
+        else:
+            return chr(n + ord('A') - 1) + result
+
+
 @main_bp.route('/')
 def home():
-	return 'Homepage'
-
-@app.errorhandler(404)
-def not_found(error):
-	return make_response(jsonify({'error': 'Not found'}), 404)
-		
-@app.errorhandler(400)
-def not_found(error):
-	return make_response(jsonify({'error': 'Bad request'}), 400)
+    data = request.get_json()
+    return num_to_excel_col(data['to_excel'])

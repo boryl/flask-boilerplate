@@ -1,99 +1,112 @@
-from flask import Blueprint, jsonify, abort, make_response, request
-from flask import current_app as app
-from .models import db, Author, AuthorSchema
+from flask import jsonify, abort, make_response, request
+from flask.views import MethodView
 from sqlalchemy.exc import IntegrityError
+from .models import db, Author, AuthorSchema
+from .decorators import require_token
 
-author_bp = Blueprint('author_bp', __name__)
 
 author_schema = AuthorSchema()
 authors_schema = AuthorSchema(many=True)
 
 
-##CREATE
-@author_bp.route('/', methods=['POST'])
-def new_author():
-	payload = request.json
-	
-	new_author, errors = author_schema.load(payload)
-	
-	# Validate payload
-	if(errors):
-		abort(make_response(jsonify(error='Can´t parse payload'), 400))
-	
-	try:
-		db.session.add(new_author)
-		db.session.commit()
-	except IntegrityError:
-		db.session.rollback()
-		abort(make_response(jsonify(error='Author {name} exists already'.format(name=payload['name'])), 409))
-	
-	return jsonify(author_schema.dump(new_author).data), 201
+# Operations on all authors
+class AuthorsApi(MethodView):
+    @require_token
+    def get(self):
+        # Get all authors
+        authors = Author.query.order_by(Author.name).all()
+        if authors is None:
+            abort(404, 'Books not found')
+        else:
+            return make_response(
+                jsonify(authors_schema.dump(authors).data), 200
+                )
+
+    @require_token
+    def post(self):
+        # Add new author
+        payload = request.json
+        new_author, errors = author_schema.load(payload)
+
+        if(errors):
+            abort(400, 'Can´t parse payload')
+
+        try:
+            db.session.add(new_author)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            abort(
+                409, 'Author {name} exists already'.
+                format(name=new_author.name)
+                )
+
+        return make_response(jsonify(author_schema.dump(new_author).data), 201)
 
 
+# Operations on a single author
+class AuthorApi(MethodView):
+    @require_token
+    def get(self, author_id):
+        # Get one author
+        author = Author.query.get(author_id)
 
-# READ
-@author_bp.route('/<int:author_id>', methods=['GET'])
-def list_author(author_id):
-	author = Author.query.get(author_id)
-	
-	if author is None:
-		abort(make_response(jsonify(error='Author not found for id: {author_id}'.format(author_id=author_id)), 404))
-		
-	else:
-		return jsonify(author_schema.dump(author).data), 200
+        if author is None:
+            abort(
+                404, 'Author not found for id {id}'
+                .format(id=author_id), 404
+                )
+        else:
+            return make_response(jsonify(author_schema.dump(author).data), 200)
 
+    @require_token
+    def put(self, author_id):
+        # Update author
+        payload = request.json
 
-@author_bp.route('/', methods=['GET'])	
-def list_authors():
-	authors = Author.query.order_by(Author.name).all()
-	if authors is None:
-		abort(make_response(jsonify(error='Authors not found'), 404))
-		
-	else:
-		return jsonify(authors_schema.dump(authors).data), 200
-	
+        update, errors = author_schema.load(payload)
 
+        if(errors):
+            abort(400, 'Can´t parse payload')
 
-# UPDATE
-@author_bp.route('/<int:author_id>', methods=['PUT'])
-def update_author(author_id):
-	
-	payload = request.json
-	
-	update, errors = author_schema.load(payload)
-	
-	if(errors):
-		abort(make_response(jsonify(error='Can´t parse payload'), 400))
-	
-	update_author = Author.query.get(author_id)
-	
-	if update_author is None:
-		abort(make_response(jsonify(error='Author not found for id: {author_id}'.format(author_id=author_id)), 404))
-	
-	else:
-		update.id = update_author.id
-		try:
-			db.session.merge(update)
-			db.session.commit()
-		except IntegrityError:
-			db.session.rollback()
-			abort(make_response(jsonify(error='Author {name} exists already'.format(name=payload['name'])), 409))
+        update_author = Author.query.get(author_id)
 
-		return jsonify(author_schema.dump(update).data), 200
-		
-		
+        if update_author is None:
+            abort(
+                404, 'Author not found for id {id}'.
+                format(id=author_id)
+            )
+        else:
+            update.id = update_author.id
+            try:
+                db.session.merge(update)
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                abort(
+                    409, 'Author {name} exists already'.
+                    format(name=update_author.name)
+                    )
 
-# DELETE
-@author_bp.route('/<int:author_id>', methods=['DELETE'])
-def delete_author(author_id):
-	
-	# Get the person requested
-	author = Author.query.get(author_id)
+        return make_response(
+            jsonify(author_schema.dump(update_author).data),
+            200
+            )
 
-	# Did we find a person?
-	if author is None:
-		abort(make_response(jsonify(error='Author not found for id: {author_id}'.format(author_id=author_id)), 404))
-	else:
-		db.session.delete(author)
-		db.session.commit()
-		return make_response(jsonify(message='Author {id} deleted'.format(id=author_id)), 200)
+    def delete(self, author_id):
+        # Delete author
+        author = Author.query.get(author_id)
+
+        if author is None:
+            abort(
+                404, 'Author not found for id: {id}'.
+                format(id=author_id)
+            )
+        else:
+            db.session.delete(author)
+            db.session.commit()
+            return make_response(
+                    jsonify(message='Author {id} deleted'.
+                            format(id=author_id)),
+                    200
+                    )
