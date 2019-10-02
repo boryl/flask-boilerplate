@@ -1,5 +1,7 @@
 # Flask boilerplate
 
+API/APP Boilerplate code. Gunicorn, SQLalchemy, Marshmallow, Flasgger, Boto3, Click
+
 ## Prerequisites
 * Python 3.7 with pip3 (install using Homebrew)
 * Postgres (install using Homebrew)
