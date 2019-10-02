@@ -1,3 +1,12 @@
+'''
+    File name: config.py
+    Projekt: Flask boilerplate
+    Author: Björn-Olle Rylander
+    Date created: 2019-07-07
+    Python Version: 3.7.4
+    Description: Configuration
+'''
+
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -25,23 +34,22 @@ class stage(Config):
     DEBUG = True
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
-    CLOUDCUBE_ACCESS_KEY_ID = os.getenv('CLOUDCUBE_ACCESS_KEY_ID')
-    CLOUDCUBE_SECRET_ACCESS_KEY = os.getenv('CLOUDCUBE_SECRET_ACCESS_KEY')
-    CLOUDCUBE_URL = os.getenv('CLOUDCUBE_URL')
-    CLOUDCUBE_REGION_NAME = os.getenv('CLOUDCUBE_REGION_NAME')
-    CLOUDCUBE_BUCKET_NAME = os.getenv('CLOUDCUBE_BUCKET_NAME')
-    CLOUDCUBE_FOLDER_PREFIX = os.getenv('CLOUDCUBE_FOLDER_PREFIX')
 
 
 class development(Config):
     DEBUG = True
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
-    # SQLALCHEMY_DATABASE_URI = 'sqlite:///' \
-    #    + os.path.join(basedir, 'app.sqlite3')
-    CLOUDCUBE_ACCESS_KEY_ID = os.getenv('CLOUDCUBE_ACCESS_KEY_ID')
-    CLOUDCUBE_SECRET_ACCESS_KEY = os.getenv('CLOUDCUBE_SECRET_ACCESS_KEY')
-    CLOUDCUBE_URL = os.getenv('CLOUDCUBE_URL')
-    CLOUDCUBE_REGION_NAME = os.getenv('CLOUDCUBE_REGION_NAME')
-    CLOUDCUBE_BUCKET_NAME = os.getenv('CLOUDCUBE_BUCKET_NAME')
-    CLOUDCUBE_FOLDER_PREFIX = os.getenv('CLOUDCUBE_FOLDER_PREFIX')
+    STAGE_BUCKET_ACCESS_KEY_ID = os.getenv('STAGE_BUCKET_ACCESS_KEY_ID')
+    STAGE_BUCKET_SECRET_ACCESS_KEY = os.getenv(
+        'STAGE_BUCKET_SECRET_ACCESS_KEY'
+        )
+    BUCKET_REGION_NAME = os.getenv('BUCKET_REGION_NAME')
+    BUCKET_NAME = os.getenv('BUCKET_NAME')
+    BUCKET_FOLDER_PREFIX = os.getenv('BUCKET_FOLDER_PREFIX')
+    APP_CONTENT_FOLDER = os.path.join(basedir + '/resources/master/')
+    APP_CONTENT_BUILD_FOLDER = os.path.join(
+        basedir + '/resources/contentbuild/'
+        )
+    APP_CONTENT_FILE = 'appcontent.json'
+    APP_CSV_FILE = 'source.csv'

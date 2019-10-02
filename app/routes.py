@@ -1,22 +1,18 @@
-from flask import Blueprint, request
+'''
+    File name: routes.py
+    Projekt: Flask boilerplate
+    Author: Björn-Olle Rylander
+    Date created: 2019-07-07
+    Python Version: 3.7.4
+    Description: Main routes
+'''
+
+from flask import Blueprint
 
 
 main_bp = Blueprint('main_bp', __name__)
 
 
-def num_to_excel_col(n):
-    if n < 1:
-        raise ValueError("Number must be positive")
-    result = ""
-    while True:
-        if n > 26:
-            n, r = divmod(n - 1, 26)
-            result = chr(r + ord('A')) + result
-        else:
-            return chr(n + ord('A') - 1) + result
-
-
 @main_bp.route('/')
 def home():
-    data = request.get_json()
-    return num_to_excel_col(data['to_excel'])
+    return ('Homepage')

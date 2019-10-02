@@ -1,3 +1,12 @@
+'''
+    File name: errors.py
+    Projekt: Flask boilerplate
+    Author: Björn-Olle Rylander
+    Date created: 2019-07-07
+    Python Version: 3.7.4
+    Description: Error routes
+'''
+
 from flask import jsonify, make_response
 
 
@@ -28,4 +37,10 @@ def internal_server_error(e):
 def method_not_allowed(e):
     return make_response(
         jsonify(error=str(e)), 405
+    )
+
+
+def conflict(e):
+    return make_response(
+        jsonify(error=str(e)), 409
     )

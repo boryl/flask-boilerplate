@@ -1,7 +1,16 @@
-from flask import jsonify, make_response, request, abort
+'''
+    File name: book.py
+    Projekt: Flask boilerplate
+    Author: Björn-Olle Rylander
+    Date created: 2019-07-07
+    Python Version: 3.7.4
+    Description: API template
+'''
+
+from flask import jsonify, make_response, abort
 from flask.views import MethodView
 from .models import db, Book, BookSchema, BookPostSchema, Author
-from .decorators import require_token
+from .decorators import require_token, validate
 
 book_post_schema = BookPostSchema()
 book_schema = BookSchema()
@@ -20,17 +29,12 @@ class BooksApi(MethodView):
         if books is None:
             abort(404, 'Books not found')
         else:
-            return make_response(jsonify(books_schema.dump(books).data), 200)
+            return make_response(jsonify(books_schema.dump(books)), 200)
 
     @require_token
-    def post(self):
+    @validate(book_post_schema)
+    def post(self, new_book):
         # Add new book
-        payload = request.json
-        new_book, errors = book_post_schema.load(payload)
-        print(new_book)
-        if(errors):
-            abort(400, 'Can´t parse payload')
-
         book_author = Author.query.get(new_book.author_id)
 
         if book_author is None:
@@ -42,7 +46,7 @@ class BooksApi(MethodView):
         db.session.add(new_book)
         db.session.commit()
 
-        return make_response(jsonify(book_schema.dump(new_book).data), 201)
+        return make_response(jsonify(book_schema.dump(new_book)), 201)
 
 
 # Operations on a single book
@@ -58,18 +62,12 @@ class BookApi(MethodView):
                 .format(id=book_id), 404
                 )
         else:
-            return make_response(jsonify(book_schema.dump(book).data), 200)
+            return make_response(jsonify(book_schema.dump(book)), 200)
 
     @require_token
-    def put(self, book_id):
+    @validate(book_post_schema)
+    def put(self, update, book_id):
         # Update book
-        payload = request.json
-
-        update, errors = book_post_schema.load(payload)
-
-        if(errors):
-            abort(400, 'Can´t parse payload')
-
         update_book = Book.query.get(book_id)
         book_author = Author.query.get(update.author_id)
 
@@ -88,12 +86,12 @@ class BookApi(MethodView):
             db.session.merge(update)
             db.session.commit()
 
-        return make_response(jsonify(book_schema.dump(update_book).data), 200)
+        return make_response(jsonify(book_schema.dump(update_book)), 200)
 
+    @require_token
     def delete(self, book_id):
         # Delete book
         book = Book.query.get(book_id)
-
         if book is None:
             abort(
                 404, 'Book not found for id: {id}'.

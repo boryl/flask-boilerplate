@@ -1,8 +1,17 @@
-from flask import jsonify, abort, make_response, request
+'''
+    File name: author.py
+    Projekt: Flask boilerplate
+    Author: Björn-Olle Rylander
+    Date created: 2019-07-07
+    Python Version: 3.7.4
+    Description: API template
+'''
+
+from flask import jsonify, abort, make_response
 from flask.views import MethodView
 from sqlalchemy.exc import IntegrityError
 from .models import db, Author, AuthorSchema
-from .decorators import require_token
+from .decorators import require_token, validate
 
 
 author_schema = AuthorSchema()
@@ -19,18 +28,13 @@ class AuthorsApi(MethodView):
             abort(404, 'Books not found')
         else:
             return make_response(
-                jsonify(authors_schema.dump(authors).data), 200
+                jsonify(authors_schema.dump(authors)), 200
                 )
 
     @require_token
-    def post(self):
+    @validate(author_schema)
+    def post(self, new_author):
         # Add new author
-        payload = request.json
-        new_author, errors = author_schema.load(payload)
-
-        if(errors):
-            abort(400, 'Can´t parse payload')
-
         try:
             db.session.add(new_author)
             db.session.commit()
@@ -41,7 +45,7 @@ class AuthorsApi(MethodView):
                 format(name=new_author.name)
                 )
 
-        return make_response(jsonify(author_schema.dump(new_author).data), 201)
+        return make_response(jsonify(author_schema.dump(new_author)), 201)
 
 
 # Operations on a single author
@@ -57,18 +61,12 @@ class AuthorApi(MethodView):
                 .format(id=author_id), 404
                 )
         else:
-            return make_response(jsonify(author_schema.dump(author).data), 200)
+            return make_response(jsonify(author_schema.dump(author)), 200)
 
     @require_token
-    def put(self, author_id):
+    @validate(author_schema)
+    def put(self, update, author_id):
         # Update author
-        payload = request.json
-
-        update, errors = author_schema.load(payload)
-
-        if(errors):
-            abort(400, 'Can´t parse payload')
-
         update_author = Author.query.get(author_id)
 
         if update_author is None:
@@ -89,10 +87,11 @@ class AuthorApi(MethodView):
                     )
 
         return make_response(
-            jsonify(author_schema.dump(update_author).data),
+            jsonify(author_schema.dump(update_author)),
             200
             )
 
+    @require_token
     def delete(self, author_id):
         # Delete author
         author = Author.query.get(author_id)

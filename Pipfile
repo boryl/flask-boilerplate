@@ -1,0 +1,46 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+
+[packages]
+alembic = "*"
+apispec = "*"
+attrs = "*"
+boto3 = "*"
+botocore = "*"
+Click = "*"
+docutils = "*"
+flasgger = "*"
+Flask = "*"
+flask-marshmallow = "*"
+Flask-Migrate = "*"
+Flask-SQLAlchemy = "*"
+gunicorn = "*"
+itsdangerous = "*"
+Jinja2 = "*"
+jmespath = "*"
+jsonschema = "*"
+Mako = "*"
+MarkupSafe = "*"
+marshmallow = "*"
+marshmallow-sqlalchemy = "*"
+mistune = "*"
+psycopg2 = "*"
+pyrsistent = "*"
+python-dateutil = "*"
+python-dotenv = "*"
+python-editor = "*"
+PyYAML = "*"
+s3transfer = "*"
+six = "*"
+SQLAlchemy = "*"
+urllib3 = "*"
+webargs = "*"
+Werkzeug = "*"
+
+[requires]
+python_version = "3.7"
